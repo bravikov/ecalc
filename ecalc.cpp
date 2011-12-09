@@ -270,6 +270,16 @@ int main(int argv, char **argc)
       if (func == "h") { mini_help(); continue; }
       if (func == "quit") break;
       if (func == "exit") break;
+      
+      /* Русский вариант функций */
+      if (func == "ом") { ohm(); continue; }
+      if (func == "диод") { diode(); continue; }
+      if (func == "номинал") { nom(); continue; }
+      if (func == "делитель") { div(); continue; }
+      if (func == "справка") { big_help(); continue; }
+      if (func == "функции") { mini_help(); continue; }
+      if (func == "выход") break;
+
     }
   return 0;
 }
