@@ -1,6 +1,6 @@
 // ecalc.cpp
 // Электротехнический калькулятор
-// Сборка: g++ ecalc.cpp
+// Сборка: g++ ecalc.cpp -o ecalc
 
 #include <iostream>
 #include <cmath>
@@ -14,6 +14,13 @@ double input(string promt)
   cin >> result;
   if (cin.fail()) { cin.clear(); string str; cin >> str; }
   return result;
+}
+
+void input(string promt, int & result)
+{
+  cout << promt << ": ";
+  cin >> result;
+  if (cin.fail()) { cin.clear(); string str; cin >> str; }
 }
 
 void input(string promt, string &result)
@@ -154,7 +161,26 @@ void diode()
 
 void nom()
 {
+  int e = 0; // Кол-во элементво в ряду (6, 12, 24, 48, 96 или 192)
+  double v = 0;
   
+  int n = 0;
+  // цикл прервется, когда будет введено достаточное количесво параметров
+  while(1)
+    {
+      if (e == 0)
+        {
+          input(" Ряд (6, 12, 24, 48, 96 или 192)", e);
+          if (e != 6 && e != 12 && e != 24 && e != 48 && e != 96 && e != 192)
+            { e = 0; continue; }
+        }
+      
+      if (v == 0)
+        {
+          v = input(" Значение");
+          if (v) break;
+        }
+    }
 }
 
 void div()
