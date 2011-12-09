@@ -1,6 +1,6 @@
 // ecalc.cpp
 // Электротехнический калькулятор
-// Компиляция: g++ ecalc.cpp
+// Сборка: g++ ecalc.cpp
 
 #include <iostream>
 #include <cmath>
@@ -45,16 +45,16 @@ void ohm()
           if (u)    if (++n == 2) break;
         }
       
-      if (p == 0)
-        {
-          p = input(" Мощность");
-          if (p)      if (++n == 2) break;
-        }
-      
       if (r == 0)
         {
           r = input(" Сопротивление");
           if (r) if (++n == 2) break;
+        }
+      
+      if (p == 0)
+        {
+          p = input(" Мощность");
+          if (p)      if (++n == 2) break;
         }
     }
 
@@ -152,35 +152,108 @@ void diode()
     cout << "    КПД = "<< eff*100 << " %" << endl;
 }
 
-void
-nom()
-  {
+void nom()
+{
+  
+}
+
+void div()
+{
+  double i = 0;   // ток в делителе
+  double ru = 0;  // верхнее сопротивление
+  double rd = 0;  // нижнее сопротивление
+  double uo = 0;  // входное напряжение
+  double ui = 0;  // выходное напряжение
+  
+  int n = 0;
+  // цикл прервется, когда будет введено достаточное количесво параметров
+  while(1)
+    {
+      if (ui == 0)
+        {
+          ui = input(" Входное напряжение");
+          if (ui)    if (++n == 3) break;
+        }
+      
+      if (uo == 0)
+        {
+          uo = input(" Выходное напряжение");
+          if (uo)    if (++n == 3) break;
+        }
+      
+      if (ru == 0)
+        {
+          ru = input(" Верхнее сопротивление");
+          if (ru)      if (++n == 3) break;
+        }
+        
+      if (rd == 0)
+        {
+          rd = input(" Нижнее сопротивление");
+          if (rd)      if (++n == 3) break;
+        }
+    }
     
-  }
+    while(1)
+    {
+      if (ui && rd && ru) // uo?
+        {
+          uo = ui*rd/(rd+ru);
+          cout << "  Выходное напряжение = " << uo << " В" << endl;
+          break;
+        }
+      
+      if (uo && rd && ru) // ui?
+        {
+          ui = uo * (rd + ru) / rd;
+          cout << "  Входное напряжение = " << ui << " В" << endl;
+          break;
+        }
+      
+      if (uo && ui && rd) // ru?
+        {
+          ru = rd * (ui / uo - 1);
+          cout << "  Верхнее сопротивление = " << ru << " Ом" << endl;
+          break;
+        }
+        
+      if (uo && ui && ru) // rd?
+        {
+          rd = ru / (ui / uo - 1);
+          cout << "  Нижнее сопротивление = " << rd << " Ом" << endl;
+          break;
+        }
+    }
+      
+    i = uo/rd;
+    cout << "  Ток в делителе = " << i << " А" << endl;
+}
 
 void big_help()
 {
   cout << "Описание функций:" << endl << endl;
   
-  cout << "  ohm - Закон Ома. Расчет двух из четырех параметров" << endl;
-  cout << "        (напряжение, ток, мощность, сопротивление)," << endl; 
-  cout << "        когда заданы два другие." << endl << endl;
+  cout <<"  ohm - Закон Ома. Расчет двух из четырех параметров" << endl;
+  cout <<"        (напряжение, ток, мощность, сопротивление)," << endl; 
+  cout <<"        когда заданы два другие." << endl << endl;
   
-  cout << "  nom - Расчет левого и правого номинала для заданного значения\n\n";
+  cout <<"  nom - Расчет левого и правого номинала для заданного значения.\n\n";
   
-  cout << "  diode - Расчет резистора в цепи диода." << endl << endl;
+  cout <<"  div - Расчет параметров делителя.\n\n";
   
-  cout << "  quit или exit - Выход из программы." << endl << endl; 
+  cout <<"  diode - Расчет резистора в цепи диода." << endl << endl;
   
-  cout << "  help - Справка. Описание функций." << endl << endl;
+  cout <<"  quit или exit - Выход из программы." << endl << endl; 
   
-  cout << "  h - Справка. Список функций без описания." << endl << endl; 
+  cout <<"  help - Справка. Описание функций." << endl << endl;
+  
+  cout <<"  h - Справка. Список функций без описания." << endl << endl; 
 }
 
 void mini_help()
 {
   cout << "Список функций:" << endl;
-  cout << "ohm, diode, quit, exit, help, h" << endl;
+  cout << "ohm, diode, nom, div, quit, exit, help, h" << endl;
 }
 
 int main(int argv, char **argc)
@@ -191,6 +264,8 @@ int main(int argv, char **argc)
       input("Функция", func);
       if (func == "ohm") { ohm(); continue; }
       if (func == "diode") { diode(); continue; }
+      if (func == "nom") { nom(); continue; }
+      if (func == "div") { div(); continue; }
       if (func == "help") { big_help(); continue; }
       if (func == "h") { mini_help(); continue; }
       if (func == "quit") break;
