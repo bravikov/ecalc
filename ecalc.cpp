@@ -9,7 +9,7 @@ using namespace std;
 
 double input(string promt)
 {
-  cout << promt << ": ";
+  cout << promt;
   double result;
   cin >> result;
   if (cin.fail()) { cin.clear(); string str; cin >> str; }
@@ -18,14 +18,14 @@ double input(string promt)
 
 void input(string promt, int & result)
 {
-  cout << promt << ": ";
+  cout << promt;
   cin >> result;
   if (cin.fail()) { cin.clear(); string str; cin >> str; }
 }
 
 void input(string promt, string &result)
 {
-  cout << promt << ": ";
+  cout << promt;
   cin >> result;
 }
 
@@ -42,25 +42,25 @@ void ohm()
     {
       if (i == 0)
         {
-          i = input(" Ток");
+          i = input(" Ток, А: ");
           if (i)    if (++n == 2) break;
         }
       
       if (u == 0)
         {
-          u = input(" Напряжение");
+          u = input(" Напряжение, В: ");
           if (u)    if (++n == 2) break;
         }
       
       if (r == 0)
         {
-          r = input(" Сопротивление");
+          r = input(" Сопротивление, Ом: ");
           if (r) if (++n == 2) break;
         }
       
       if (p == 0)
         {
-          p = input(" Мощность");
+          p = input(" Мощность, Вт: ");
           if (p)      if (++n == 2) break;
         }
     }
@@ -130,19 +130,19 @@ void diode()
     {
       if (i == 0)
         {
-          i = input(" Ток");
+          i = input(" Ток, А: ");
           if (i)    if (++n == 3) break;
         }
       
       if (ud == 0)
         {
-          ud = input(" Диодное напряжение");
+          ud = input(" Диодное напряжение, В: ");
           if (ud)    if (++n == 3) break;
         }
       
       if (e == 0)
         {
-          e = input(" Напряжение питания");
+          e = input(" Напряжение питания, В: ");
           if (e)      if (++n == 3) break;
         }
     }
@@ -178,14 +178,14 @@ void nom()
     {
       if (e == 0)
         {
-          input(" Ряд (6, 12, 24, 48, 96 или 192)", e);
+          input(" Ряд: E", e);
           if (e != 6 && e != 12 && e != 24 && e != 48 && e != 96 && e != 192)
             { e = 0; continue; }
         }
       
       if (v == 0)
         {
-          v = input(" Значение");
+          v = input(" Значение: ");
           if (v) break;
         }
     }
@@ -240,25 +240,25 @@ void div()
     {
       if (ui == 0)
         {
-          ui = input(" Входное напряжение");
+          ui = input(" Входное напряжение: ");
           if (ui)    if (++n == 3) break;
         }
       
       if (uo == 0)
         {
-          uo = input(" Выходное напряжение");
+          uo = input(" Выходное напряжение: ");
           if (uo)    if (++n == 3) break;
         }
       
       if (ru == 0)
         {
-          ru = input(" Верхнее сопротивление");
+          ru = input(" Верхнее сопротивление: ");
           if (ru)      if (++n == 3) break;
         }
         
       if (rd == 0)
         {
-          rd = input(" Нижнее сопротивление");
+          rd = input(" Нижнее сопротивление: ");
           if (rd)      if (++n == 3) break;
         }
     }
@@ -285,7 +285,7 @@ void div()
           cout << "  Верхнее сопротивление = " << ru << " Ом" << endl;
           break;
         }
-        
+      
       if (uo && ui && ru) // rd?
         {
           rd = ru / (ui / uo - 1);
@@ -300,28 +300,28 @@ void div()
 
 void big_help()
 {
-  cout << "Описание функций:" << endl << endl;
+  cout << "Описание команд:" << endl << endl;
   
   cout <<"  ohm - Закон Ома. Расчет двух из четырех параметров" << endl;
-  cout <<"        (напряжение, ток, мощность, сопротивление)," << endl; 
+  cout <<"        (напряжение, ток, мощность, сопротивление)," << endl;
   cout <<"        когда заданы два другие." << endl << endl;
   
-  cout <<"  nom - Расчет двух ближайщих номиналов для заданного значения.\n";
+  cout <<"  nom - Расчет ближайщих номиналов для заданного значения.\n";
   
   cout <<"  div - Расчет параметров делителя.\n\n";
   
-  cout <<"  diode - Расчет резистора в цепи диода." << endl << endl;
+  cout <<"  diode - Расчет параметров резистора в цепи диода." << endl << endl;
   
-  cout <<"  quit или exit - Выход из программы." << endl << endl; 
+  cout <<"  quit или exit - Выход из программы." << endl << endl;
   
-  cout <<"  help - Справка. Описание функций." << endl << endl;
+  cout <<"  help - Справка. Описание команд." << endl << endl;
   
-  cout <<"  h - Справка. Список функций без описания." << endl << endl; 
+  cout <<"  h - Справка. Список команд без описания." << endl << endl;
 }
 
 void mini_help()
 {
-  cout << "Список функций:" << endl;
+  cout << "Список команд:" << endl;
   cout << "ohm, diode, nom, div, quit, exit, help, h" << endl;
 }
 
@@ -330,7 +330,7 @@ int main(int argv, char **argc)
   while(1)
     {
       string func;
-      input("Функция", func);
+      input("Команда: ", func);
       if (func == "ohm") { ohm(); continue; }
       if (func == "diode") { diode(); continue; }
       if (func == "nom") { nom(); continue; }
@@ -340,7 +340,7 @@ int main(int argv, char **argc)
       if (func == "quit") break;
       if (func == "exit") break;
       
-      /* Русский вариант функций */
+      /* Русский вариант команд */
       if (func == "ом") { ohm(); continue; }
       if (func == "диод") { diode(); continue; }
       if (func == "номинал") { nom(); continue; }
@@ -348,7 +348,6 @@ int main(int argv, char **argc)
       if (func == "справка") { big_help(); continue; }
       if (func == "функции") { mini_help(); continue; }
       if (func == "выход") break;
-
     }
   return 0;
 }
