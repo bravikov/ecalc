@@ -1,30 +1,83 @@
 // ecalc.cpp
 // Электротехнический калькулятор
-// Сборка: g++ ecalc.cpp -o ecalc
+// Сборка и запуск: g++ ecalc.cpp -o ecalc && ./ecalc
 
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <cmath>
 
 using namespace std;
 
+// Возвращает строку формата: <число><пробел>[приставка СИ]
+string output(double value)
+{
+  int order = 0;
+  
+  while (value >= 1000)
+  {
+    if (order == 9) break;
+    value /= 1000;
+    order += 3;
+  }
+  
+  while (value < 1)
+  {
+    if (order == -12) break;
+    value *= 1000;
+    order -= 3;
+  }
+  
+  stringstream ss;
+  ss << value << " ";
+  switch(order)
+  {
+    case -12: ss << "п";  break;
+    case  -9: ss << "н";  break;
+    case  -6: ss << "мк"; break;
+    case  -3: ss << "м";  break;
+    case   3: ss << "к";  break;
+    case   6: ss << "М";  break;
+    case   9: ss << "Г";  break;
+  }
+  
+  return ss.str();
+}
+
 double input(string promt)
 {
+  // TODO: сделать обработку ошибок
   cout << promt;
-  double result;
-  cin >> result;
-  if (cin.fail()) { cin.clear(); string str; cin >> str; }
-  return result;
+  string in;
+  cin >> in;
+  int order = 0;
+  // Определить приставку СИ
+  switch(in[in.size() - 1])
+  {
+     case 'p': order = -12; break;
+     case 'n': order = -9; break;
+     case 'u': order = -6; break;
+     case 'm': order = -3; break;
+     case 'k': order = 3; break;
+     case 'M': order = 6; break;
+     case 'G': order = 9; break;
+  }
+  if (order) in.resize(in.size() - 1);
+  double val = 0.0;
+  stringstream(in) >> val;
+  return val * pow(10, order);
 }
 
 void input(string promt, int & result)
 {
+  // TODO: сделать обработку ошибок
   cout << promt;
   cin >> result;
-  if (cin.fail()) { cin.clear(); string str; cin >> str; }
 }
 
 void input(string promt, string &result)
 {
+  // TODO: сделать обработку ошибок
   cout << promt;
   cin >> result;
 }
@@ -68,48 +121,48 @@ void ohm()
   if (p && i)
     {
       u = p/i; r = p / (i*i);
-      cout << "  Напряжение = " << u << " В" << endl;
-      cout << "  Сопротивление = "<< r << " Ом" << endl;
+      cout << "  Напряжение = "     << output(u) << "В"  << endl;
+      cout << "  Сопротивление = "  << output(r) << "Ом" << endl;
       return;
     }
     
   if (p && r)
     {
       i = sqrt(p/r); u = sqrt(p*r);
-      cout << "  Ток = " << i << " А" << endl;
-      cout << "  Напряжение = "<< u << " В" << endl;
+      cout << "  Ток = "            << output(i) << "А"  << endl;
+      cout << "  Напряжение = "     << output(u) << "В"  << endl;
       return;
     }
     
   if (p && u)
     {
       i = p/u; r = u*u/p;
-      cout << "  Ток = " << i << " А" << endl;  
-      cout << "  Сопротивление = "<< r << " Ом" << endl;
+      cout << "  Ток = "            << output(i) << "А"  << endl;
+      cout << "  Сопротивление = "  << output(r) << "Ом" << endl;
       return;
     }
     
   if (i && u)
     {
       p = i*u; r = u/i;
-      cout << "  Сопротивление = " << r << " Ом" << endl;
-      cout << "  Мощность = "<< p << " Вт" << endl;
+      cout << "  Сопротивление = "  << output(r) << "Ом" << endl;
+      cout << "  Мощность = "       << output(p) << "Вт" << endl;
       return;
     }
     
   if (i && r)
     {
       u = i*r; p = i*i*r;
-      cout << "  Напряжение = " << u << " В" << endl;
-      cout << "  Мощность = "<< p << " Вт" << endl;
+      cout << "  Напряжение = "     << output(u) << "В"  << endl;
+      cout << "  Мощность = "       << output(p) << "Вт" << endl;
       return;
     }
   
   if (u && r)
     {
       i = u/r; p = u*u/r;
-      cout << "  Ток = " << i << " А" << endl;
-      cout << "  Мощность = "<< p << " Вт" << endl;
+      cout << "  Ток = "            << output(i) << "А"  << endl;
+      cout << "  Мощность = "       << output(p) << "Вт" << endl;
       return;
     }
 }
@@ -153,10 +206,10 @@ void diode()
     eff = ur / e;
     
     cout << "  Характеристики резистора" << endl;
-    cout << "    Сопротивление = " << r << " Ом" << endl;
-    cout << "    Мощность = "<< p << " Вт" << endl;
-    cout << "    Напряжение = "<< ur << " В" << endl;
-    cout << "    КПД = "<< eff*100 << " %" << endl;
+    cout << "    Сопротивление = " << output(r)  << "Ом" << endl;
+    cout << "    Мощность = "      << output(p)  << "Вт" << endl;
+    cout << "    Напряжение = "    << output(ur) << "В"  << endl;
+    cout << "    КПД = "           << eff*100    << " %" << endl;
 }
 
 // Ряды номиналов рядиодеталей 
@@ -268,34 +321,34 @@ void div()
       if (ui && rd && ru) // uo?
         {
           uo = ui*rd/(rd+ru);
-          cout << "  Выходное напряжение = " << uo << " В" << endl;
+          cout << "  Выходное напряжение = "   << output(uo) << "В"  << endl;
           break;
         }
       
       if (uo && rd && ru) // ui?
         {
           ui = uo * (rd + ru) / rd;
-          cout << "  Входное напряжение = " << ui << " В" << endl;
+          cout << "  Входное напряжение = "    << output(ui) << "В"  << endl;
           break;
         }
       
       if (uo && ui && rd) // ru?
         {
           ru = rd * (ui / uo - 1);
-          cout << "  Верхнее сопротивление = " << ru << " Ом" << endl;
+          cout << "  Верхнее сопротивление = " << output(ru) << "Ом" << endl;
           break;
         }
       
       if (uo && ui && ru) // rd?
         {
           rd = ru / (ui / uo - 1);
-          cout << "  Нижнее сопротивление = " << rd << " Ом" << endl;
+          cout << "  Нижнее сопротивление = "  << output(rd) << "Ом" << endl;
           break;
         }
     }
       
     i = uo/rd;
-    cout << "  Ток в делителе = " << i << " А" << endl;
+    cout << "  Ток в делителе = "              << output(i)  << "А"  << endl;
 }
 
 void big_help()
@@ -331,23 +384,23 @@ int main(int argv, char **argc)
     {
       string func;
       input("Команда: ", func);
-      if (func == "ohm") { ohm(); continue; }
-      if (func == "diode") { diode(); continue; }
-      if (func == "nom") { nom(); continue; }
-      if (func == "div") { div(); continue; }
-      if (func == "help") { big_help(); continue; }
-      if (func == "h") { mini_help(); continue; }
-      if (func == "quit") break;
-      if (func == "exit") break;
+      if (func == "ohm")   { ohm();       continue; }
+      if (func == "diode") { diode();     continue; }
+      if (func == "nom")   { nom();       continue; }
+      if (func == "div")   { div();       continue; }
+      if (func == "help")  { big_help();  continue; }
+      if (func == "h")     { mini_help(); continue; }
+      if (func == "quit")  break;
+      if (func == "exit")  break;
       
       /* Русский вариант команд */
-      if (func == "ом") { ohm(); continue; }
-      if (func == "диод") { diode(); continue; }
-      if (func == "номинал") { nom(); continue; }
-      if (func == "делитель") { div(); continue; }
-      if (func == "справка") { big_help(); continue; }
-      if (func == "функции") { mini_help(); continue; }
-      if (func == "выход") break;
+      if (func == "ом")       { ohm();       continue; }
+      if (func == "диод")     { diode();     continue; }
+      if (func == "номинал")  { nom();       continue; }
+      if (func == "делитель") { div();       continue; }
+      if (func == "справка")  { big_help();  continue; }
+      if (func == "функции")  { mini_help(); continue; }
+      if (func == "выход")    break;
     }
   return 0;
 }
