@@ -9,6 +9,62 @@
 
 using namespace std;
 
+/* Возвращает левый операнд выражения exp, если оператора в позиции op_pos */
+string lop(string exp, int op_pos)
+{
+  return exp.assign(exp, 0, op_pos);
+}
+
+/* Возвращает правый операнд выражения exp, если оператора в позиции op_pos */
+string rop(string exp, int op_pos)
+{
+  return exp.assign(exp, op_pos + 1, exp.size() - op_pos + 1);
+}
+
+/* Возвращает результат математического выражения exp.
+В выражении допускаются вещественные числа и операторы: '+' '-' '*' '/'.
+Порядок вычисления слева направо.
+Приоритет умножения и деления одинаковый. 
+Приоритет сложения и вычитания одинаковый, но ниже, чем у умножения и деления.*/
+double solve(string exp)
+{
+  // Очистка выражения от пробелов и табуляций
+  for(int i = 0; i < exp.size(); i--)
+    if (exp[i] == ' ' || exp[i] == '\t') exp.replace(i,1,"");
+  
+  for(int i = exp.size()-1; i >= 0; i--)
+  {
+    if ( exp[i] == '+' ) return solve(lop(exp,i)) + solve(rop(exp,i));
+    
+    if ( exp[i] == '-' ) return solve(lop(exp,i)) - solve(rop(exp,i));
+  }
+  
+  for(int i = exp.size()-1; i >= 0; i--)
+  {
+    if ( exp[i] == '*' ) return solve(lop(exp,i)) * solve(rop(exp,i));
+    
+    if ( exp[i] == '/' ) return solve(lop(exp,i)) / solve(rop(exp,i));
+  }
+   
+  int order = 0; // степень десяти
+  // Определить приставку СИ
+  switch(exp[exp.size() - 1])
+  {
+     case 'p': order = -12; break;
+     case 'n': order = -9; break;
+     case 'u': order = -6; break;
+     case 'm': order = -3; break;
+     case 'k': order = 3; break;
+     case 'M': order = 6; break;
+     case 'G': order = 9; break;
+  }
+  if (order) exp.resize(exp.size() - 1);
+  double num = 0.0;
+  stringstream(exp) >> num;
+  return num * pow(10, order);
+}
+
+
 // Возвращает строку формата: <число><пробел>[приставка СИ]
 string output(double value)
 {
@@ -44,42 +100,27 @@ string output(double value)
   return ss.str();
 }
 
-double input(string promt)
+string base_input(string promt)
 {
-  // TODO: сделать обработку ошибок
   cout << promt;
-  string in;
-  cin >> in;
-  int order = 0;
-  // Определить приставку СИ
-  switch(in[in.size() - 1])
-  {
-     case 'p': order = -12; break;
-     case 'n': order = -9; break;
-     case 'u': order = -6; break;
-     case 'm': order = -3; break;
-     case 'k': order = 3; break;
-     case 'M': order = 6; break;
-     case 'G': order = 9; break;
-  }
-  if (order) in.resize(in.size() - 1);
-  double val = 0.0;
-  stringstream(in) >> val;
-  return val * pow(10, order);
-}
-
-void input(string promt, int & result)
-{
-  // TODO: сделать обработку ошибок
-  cout << promt;
-  cin >> result;
+  char in[256];
+  cin.getline(in, 256);
+  return in;
 }
 
 void input(string promt, string &result)
 {
-  // TODO: сделать обработку ошибок
-  cout << promt;
-  cin >> result;
+  result = base_input(promt);
+}
+
+double input(string promt)
+{
+  return solve( base_input(promt) );
+}
+
+void input(string promt, int & result)
+{
+  stringstream( base_input(promt) ) >> result;
 }
 
 void ohm()
@@ -365,6 +406,8 @@ void big_help()
   
   cout <<"  diode - Расчет параметров резистора в цепи диода." << endl << endl;
   
+  cout <<"  solve - Расчет математического выражения." << endl << endl;
+  
   cout <<"  quit или exit - Выход из программы." << endl << endl;
   
   cout <<"  help - Справка. Описание команд." << endl << endl;
@@ -378,12 +421,18 @@ void mini_help()
   cout << "ohm, diode, nom, div, quit, exit, help, h" << endl;
 }
 
+void test_solve()
+{
+  cout << "  Результат: " << input(" Выражение: ") << endl;
+}
+
 int main(int argv, char **argc)
 {
   while(1)
     {
       string func;
       input("Команда: ", func);
+      if (func == "solve") { test_solve();continue; }
       if (func == "ohm")   { ohm();       continue; }
       if (func == "diode") { diode();     continue; }
       if (func == "nom")   { nom();       continue; }
