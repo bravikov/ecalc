@@ -12,40 +12,78 @@ using namespace std;
 /* Возвращает левый операнд выражения exp, если оператора в позиции op_pos */
 string lop(string exp, int op_pos)
 {
-  return exp.assign(exp, 0, op_pos);
+  exp.assign(exp, 0, op_pos);
+  return exp;
 }
 
 /* Возвращает правый операнд выражения exp, если оператора в позиции op_pos */
 string rop(string exp, int op_pos)
 {
-  return exp.assign(exp, op_pos + 1, exp.size() - op_pos + 1);
+  exp.assign(exp, op_pos + 1, exp.size() - op_pos + 1);
+  return exp;
 }
 
 /* Возвращает результат математического выражения exp.
-В выражении допускаются вещественные числа и операторы: '+' '-' '*' '/'.
-Порядок вычисления слева направо.
-Приоритет умножения и деления одинаковый. 
-Приоритет сложения и вычитания одинаковый, но ниже, чем у умножения и деления.*/
+В выражении допускаются вещественные числа и операторы: '+' '-' '*' '/' '^'
+а также скобки. Расчет выражения по математическим правилам. */
 double solve(string exp)
 {
   // Очистка выражения от пробелов и табуляций
-  for(int i = 0; i < exp.size(); i--)
-    if (exp[i] == ' ' || exp[i] == '\t') exp.replace(i,1,"");
-  
   for(int i = exp.size()-1; i >= 0; i--)
   {
-    if ( exp[i] == '+' ) return solve(lop(exp,i)) + solve(rop(exp,i));
+    if (exp[i] == ' ' || exp[i] == '\t') exp.replace(i,1,"");
+  }
+  
+  int br = 0;
+  
+  for(int i = 0; i < exp.size(); i++)
+  {
+    if ( exp[i] == '(' ) br++;
+    if ( exp[i] == ')' ) br--;
+    if (br < 0) { cout << "   Ошибка в скобках" << endl; return 0; }
+  }
+  if (br) { cout << "   Ошибка в скобках" << endl; return 0; }
+  
+  
+  // Сложение и вычитание
+  for(int i = exp.size()-1; i >= 0; i--)
+  {
+    if ( exp[i] == ')' ) br++;
+    if ( exp[i] == '(' ) br--;
+    if (br) continue;
     
+    if ( exp[i] == '+' ) return solve(lop(exp,i)) + solve(rop(exp,i));    
     if ( exp[i] == '-' ) return solve(lop(exp,i)) - solve(rop(exp,i));
   }
   
+  // Умножение и деление
   for(int i = exp.size()-1; i >= 0; i--)
   {
-    if ( exp[i] == '*' ) return solve(lop(exp,i)) * solve(rop(exp,i));
+    if ( exp[i] == ')' ) br++;
+    if ( exp[i] == '(' ) br--;
+    if (br) continue;
     
+    if ( exp[i] == '*' ) return solve(lop(exp,i)) * solve(rop(exp,i));
     if ( exp[i] == '/' ) return solve(lop(exp,i)) / solve(rop(exp,i));
   }
-   
+  
+  // Возведение в степень
+  for(int i = 0; i < exp.size(); i++)
+  {
+    if ( exp[i] == '(' ) br++;
+    if ( exp[i] == ')' ) br--;
+    if (br) continue;
+    
+    if ( exp[i] == '^' ) return pow( solve(lop(exp,i)), solve(rop(exp,i)) );
+  }
+  
+  // Обработка выражения в скобках
+  if ( exp[0] == '(' && exp[exp.size() - 1] == ')' )
+  {
+    exp.assign(exp, 1, exp.size() - 2);
+    return solve(exp);
+  }
+  
   int order = 0; // степень десяти
   // Определить приставку СИ
   switch(exp[exp.size() - 1])
@@ -423,7 +461,7 @@ void mini_help()
 
 void test_solve()
 {
-  cout << "  Результат: " << input(" Выражение: ") << endl;
+  cout << "  Ответ: " << input(" Выражение: ") << endl;
 }
 
 int main(int argv, char **argc)
