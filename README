@@ -10,7 +10,7 @@
 2. Собрать:
 
   cd ecalc
-  g++ ecalc.cpp -o ecalc
+  make
 
 3. Запустить:
 
