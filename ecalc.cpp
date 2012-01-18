@@ -196,54 +196,18 @@ void ohm()
           if (p)      if (++n == 2) break;
         }
     }
-
-  if (p && i)
-    {
-      u = p/i; r = p / (i*i);
-      cout << "  Напряжение = "     << output(u) << "В"  << endl;
-      cout << "  Сопротивление = "  << output(r) << "Ом" << endl;
-      return;
-    }
-    
-  if (p && r)
-    {
-      i = sqrt(p/r); u = sqrt(p*r);
-      cout << "  Ток = "            << output(i) << "А"  << endl;
-      cout << "  Напряжение = "     << output(u) << "В"  << endl;
-      return;
-    }
-    
-  if (p && u)
-    {
-      i = p/u; r = u*u/p;
-      cout << "  Ток = "            << output(i) << "А"  << endl;
-      cout << "  Сопротивление = "  << output(r) << "Ом" << endl;
-      return;
-    }
-    
-  if (i && u)
-    {
-      p = i*u; r = u/i;
-      cout << "  Сопротивление = "  << output(r) << "Ом" << endl;
-      cout << "  Мощность = "       << output(p) << "Вт" << endl;
-      return;
-    }
-    
-  if (i && r)
-    {
-      u = i*r; p = i*i*r;
-      cout << "  Напряжение = "     << output(u) << "В"  << endl;
-      cout << "  Мощность = "       << output(p) << "Вт" << endl;
-      return;
-    }
   
-  if (u && r)
-    {
-      i = u/r; p = u*u/r;
-      cout << "  Ток = "            << output(i) << "А"  << endl;
-      cout << "  Мощность = "       << output(p) << "Вт" << endl;
-      return;
-    }
+  if (p && i) { u = p/i;       r = p / (i*i); }
+  if (p && r) { i = sqrt(p/r); u = sqrt(p*r); }
+  if (p && u) { i = p/u;       r = u*u/p;     }
+  if (i && u) { p = i*u;       r = u/i;       }
+  if (i && r) { u = i*r;       p = i*i*r;     }
+  if (u && r) { i = u/r;       p = u*u/r;     }
+  
+  cout << "  Ток = "            << output(i) << "А"  << endl;
+  cout << "  Напряжение = "     << output(u) << "В"  << endl;
+  cout << "  Сопротивление = "  << output(r) << "Ом" << endl;
+  cout << "  Мощность = "       << output(p) << "Вт" << endl;
 }
 
 void diode()
@@ -284,11 +248,14 @@ void diode()
     p = i*ur;
     eff = ur / e;
     
-    cout << "  Характеристики резистора" << endl;
-    cout << "    Сопротивление = " << output(r)  << "Ом" << endl;
-    cout << "    Мощность = "      << output(p)  << "Вт" << endl;
-    cout << "    Напряжение = "    << output(ur) << "В"  << endl;
-    cout << "    КПД = "           << eff*100    << " %" << endl;
+    cout << "  Ток = "                   << output(i)  << "А"  << endl;
+    cout << "  Диодное напряжение = "    << output(ud) << "В"  << endl;
+    cout << "  Напряжение питания = "    << output(e)  << "В"  << endl;
+    cout << "  Характеристики резистора:"                       << endl;
+    cout << "    Сопротивление = "       << output(r)  << "Ом" << endl;
+    cout << "    Мощность = "            << output(p)  << "Вт" << endl;
+    cout << "    Напряжение = "          << output(ur) << "В"  << endl;
+    cout << "    КПД = "                 << eff*100    << " %" << endl;
 }
 
 // Ряды номиналов рядиодеталей 
@@ -372,62 +339,41 @@ void div()
     {
       if (ui == 0)
         {
-          ui = input(" Входное напряжение: ");
+          ui = input(" Входное напряжение, В: ");
           if (ui)    if (++n == 3) break;
         }
       
       if (uo == 0)
         {
-          uo = input(" Выходное напряжение: ");
+          uo = input(" Выходное напряжение, В: ");
           if (uo)    if (++n == 3) break;
         }
       
       if (ru == 0)
         {
-          ru = input(" Верхнее сопротивление: ");
+          ru = input(" Верхнее сопротивление, Ом: ");
           if (ru)      if (++n == 3) break;
         }
         
       if (rd == 0)
         {
-          rd = input(" Нижнее сопротивление: ");
+          rd = input(" Нижнее сопротивление, Ом: ");
           if (rd)      if (++n == 3) break;
         }
     }
     
-    while(1)
-    {
-      if (ui && rd && ru) // uo?
-        {
-          uo = ui*rd/(rd+ru);
-          cout << "  Выходное напряжение = "   << output(uo) << "В"  << endl;
-          break;
-        }
+  if (ui && rd && ru) uo = ui*rd/(rd+ru);
+  if (uo && rd && ru) ui = uo * (rd + ru) / rd;
+  if (uo && ui && rd) ru = rd * (ui / uo - 1);
+  if (uo && ui && ru) rd = ru / (ui / uo - 1);
       
-      if (uo && rd && ru) // ui?
-        {
-          ui = uo * (rd + ru) / rd;
-          cout << "  Входное напряжение = "    << output(ui) << "В"  << endl;
-          break;
-        }
-      
-      if (uo && ui && rd) // ru?
-        {
-          ru = rd * (ui / uo - 1);
-          cout << "  Верхнее сопротивление = " << output(ru) << "Ом" << endl;
-          break;
-        }
-      
-      if (uo && ui && ru) // rd?
-        {
-          rd = ru / (ui / uo - 1);
-          cout << "  Нижнее сопротивление = "  << output(rd) << "Ом" << endl;
-          break;
-        }
-    }
-      
-    i = uo/rd;
-    cout << "  Ток в делителе = "              << output(i)  << "А"  << endl;
+  i = uo/rd;
+  
+  cout << "  Входное напряжение = "    << output(ui) << "В"  << endl;
+  cout << "  Выходное напряжение = "   << output(uo) << "В"  << endl;
+  cout << "  Верхнее сопротивление = " << output(ru) << "Ом" << endl;
+  cout << "  Нижнее сопротивление = "  << output(rd) << "Ом" << endl;
+  cout << "  Ток в делителе = "        << output(i)  << "А"  << endl;
 }
 
 void big_help()
