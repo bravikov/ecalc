@@ -376,6 +376,86 @@ void div()
   cout << "  Ток в делителе = "        << output(i)  << "А"  << endl;
 }
 
+const int NNC_NN_to_Mantis[96] = {100, 102, 105, 107, 110, 113, 115, 118, 121, 124, 127, 130, 133, 137, 140, 143, 147, 150, 154, 158, 162, 165, 169, 174, 178, 182, 187, 191, 196, 200, 205, 210, 215, 221, 226, 232, 237, 243, 249, 255, 261, 267, 274, 280, 287, 294, 301, 309, 316, 324, 332, 340, 348, 357, 365, 374, 383, 392, 402, 412, 422, 432, 442, 453, 464, 475, 487, 499, 511, 523, 536, 549, 562, 576, 590, 604, 619, 634, 649, 665, 681, 698, 715, 732, 750, 768, 787, 806, 825, 845, 866, 887, 909, 931, 953, 976};
+     
+const int CNN_NN_to_Mantis[60] = {100, 110, 120, 130, 150, 160, 180, 200, 220, 240, 270, 300, 330, 360, 390, 430, 470, 510, 560, 620, 680, 750, 820, 910, 100, 110, 120, 130, 150, 160, 180, 200, 220, 240, 270, 300, 330, 360, 390, 430, 470, 510, 560, 620, 680, 750, 820, 910, 100, 120, 150, 180, 220, 270, 330, 390, 470, 560, 680, 820};
+     
+void chip()
+{
+  double r = 0.0;
+  
+  while(1)
+  {
+    string mark;
+    input(" Маркировка: ", mark);
+
+    int num = 0;
+    
+    if (mark == "cancel") return;
+    
+    if ( mark.length() == 4 ) // 4х символьная маркировка
+    {
+      stringstream ss_mark(mark);
+      ss_mark >> num;
+      if ( !ss_mark.fail() ) 
+      {
+        for(int i = 0; i < 192; i++)
+          if ( num/10 == E192[i] )
+          {
+            r = (num/10) * pow(10, (num%10));
+            break;
+          }
+        if (r == 0) cout << "  Несуществующий номинал: " << num/10 << endl;
+      }
+    }
+    else if ( mark.length() == 3 ) // 3х символьная маркировка
+    {
+      int c_pos = 0;
+      
+      while(1)
+      {
+        switch ( mark[c_pos] )
+        {
+          case 'S': r = 0.01;   break;
+          case 'X': r = 0.1;    break;
+          case 'R': r = 0.1;    break;
+          case 'A': r = 1;      break;
+          case 'B': r = 10;     break;
+          case 'C': r = 100;    break;
+          case 'D': r = 1000;   break;
+          case 'E': r = 10000;  break;
+          case 'F': r = 100000; break;
+        }
+        if (r != 0 || c_pos == 2) break;
+        c_pos = 2;
+      }
+      
+      if (r != 0)
+      {
+        mark.erase(c_pos, 1);
+        int nom_cod;
+        stringstream ss_mark(mark);
+        ss_mark >> nom_cod;
+        if ( !ss_mark.fail() )
+        {
+          int nom = 0;
+          if (c_pos == 0 && nom_cod >= 1 && nom_cod <= 60)
+            nom = CNN_NN_to_Mantis[nom_cod-1];
+          if (c_pos == 2 && nom_cod >= 1 && nom_cod <= 96)
+            nom = NNC_NN_to_Mantis[nom_cod-1];
+          r *= nom;
+        }
+      }
+    }
+    
+    if (r != 0) break;
+    
+    cout << "  Маркировка не распознана" << endl;
+  }
+  
+  cout << "  Сопротивление = " << output(r) << "Ом" << endl;
+}
+
 void big_help()
 {
   cout << "Описание команд:" << endl << endl;
@@ -389,6 +469,8 @@ void big_help()
   cout <<"  div - Расчет параметров делителя.\n\n";
   
   cout <<"  diode - Расчет параметров резистора в цепи диода." << endl << endl;
+  
+  cout <<"  chip - Расшифровка маркировки чип-резистора" << endl << endl;
   
   cout <<"  solve - Расчет математического выражения." << endl << endl;
   
@@ -421,6 +503,7 @@ int main(int argv, char **argc)
       if (func == "diode") { diode();     continue; }
       if (func == "nom")   { nom();       continue; }
       if (func == "div")   { div();       continue; }
+      if (func == "chip")  { chip();      continue; }
       if (func == "help")  { big_help();  continue; }
       if (func == "h")     { mini_help(); continue; }
       if (func == "quit")  break;
