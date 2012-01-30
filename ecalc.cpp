@@ -456,6 +456,45 @@ void chip()
   cout << "  Сопротивление = " << output(r) << "Ом" << endl;
 }
 
+void nomlst()
+{
+  int e = 0; // Кол-во элементво в ряду (6, 12, 24, 48, 96 или 192)
+  
+  // цикл прервется, когда будет введено достаточное количесво параметров
+  while(1)
+  {
+    input(" Ряд: E", e);
+    if (e == 6 || e == 12 || e == 24 || e == 48 || e == 96 || e == 192) break;
+  }
+   
+  const int * r;
+  
+  switch (e)
+  {
+    case 6   : r = E6;   break;
+    case 12  : r = E12;  break;
+    case 24  : r = E24;  break;
+    case 48  : r = E48;  break;
+    case 96  : r = E96;  break;
+    case 192 : r = E192; break;
+  }
+  
+  int col_count = sqrt(e);
+  int row_count = e/col_count;
+  cout << " =========" << endl;
+  for (int row = 0; row < row_count; row++)
+  {
+    cout << "  ";
+    for (int col = 0; col < col_count; col++)
+    {
+      cout << r[row + col*row_count] << "  ";
+    }
+    cout << endl;
+  }
+  
+  cout << endl;
+}
+
 void big_help()
 {
   cout << "Описание команд:" << endl << endl;
@@ -464,7 +503,10 @@ void big_help()
   cout <<"        (напряжение, ток, мощность, сопротивление)," << endl;
   cout <<"        когда заданы два другие." << endl << endl;
   
-  cout <<"  nom - Расчет ближайщих номиналов для заданного значения.\n";
+  cout <<"  nom - Расчет ближайщих номиналов для заданного значения.\n\n";
+  
+  cout <<"  nomlst - Выводит список номиналов для заданого ряда:\n";
+  cout <<"           E6, E12, E24, E48, E96, E192\n\n";
   
   cout <<"  div - Расчет параметров делителя.\n\n";
   
@@ -484,7 +526,7 @@ void big_help()
 void mini_help()
 {
   cout << "Список команд:" << endl;
-  cout << "ohm, diode, nom, div, quit, exit, help, h" << endl;
+  cout << "ohm, diode, nom, nomlst, div, chip, solve, quit, exit, help, h \n";
 }
 
 void test_solve()
@@ -502,6 +544,7 @@ int main(int argv, char **argc)
       if (func == "ohm")   { ohm();       continue; }
       if (func == "diode") { diode();     continue; }
       if (func == "nom")   { nom();       continue; }
+      if (func == "nomlst"){ nomlst();    continue; }
       if (func == "div")   { div();       continue; }
       if (func == "chip")  { chip();      continue; }
       if (func == "help")  { big_help();  continue; }
