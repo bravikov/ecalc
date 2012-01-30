@@ -314,12 +314,12 @@ void nom()
     if (r[i] < v) continue;
     
     double nom = r[i] * pow(10, exp);
-    cout << "  Номинал = "<< nom << endl;
+    cout << "  Номинал = "<< output(nom) << "Ед." << endl;
     
     if (r[i] == v) break;
     
     nom = r[i-1] * pow(10, exp);
-    cout << "  Номинал = "<< nom << endl;
+    cout << "  Номинал = "<< output(nom) << "Ед." << endl;
     
     break;
   }
