@@ -104,7 +104,7 @@ double solve(string exp)
 
 
 // Возвращает строку формата: <число><пробел>[приставка СИ]
-string output(double value)
+string output(double value, bool SI_prefix = true)
 {
   int order = 0;
   
@@ -495,6 +495,62 @@ void nomlst()
   cout << endl;
 }
 
+void db()
+{
+  double db_P = 0;
+  double db_U_or_I = 0;
+  double times_P = 0;
+  double times_U_or_I = 0;
+  
+  int n;
+  while(1)
+  {
+    db_U_or_I = input(" Отношение напряжения или тока, дБ: ");
+    if (db_U_or_I)
+    {
+      times_U_or_I = pow(10, db_U_or_I/20);
+      break;
+    }
+
+    times_U_or_I = input(" Отношение напряжений или токов, разы: ");
+    if (times_U_or_I)
+    {
+      db_U_or_I = 20 * log10(times_U_or_I);
+      break;
+    }
+
+    db_P = input(" Отношение мощностей, дБ: ");
+    if (db_P)
+    {
+      times_P = pow(10, db_P/10);
+      break;
+    }
+
+    times_P = input(" Отношение мощностей, разы: ");
+    if (times_P)
+    {
+      db_P = 10 * log10(times_P);
+      break;
+    }
+    
+    break;
+  }
+  
+  if (times_U_or_I)
+  {
+    cout << "  Отношение напряжений или токов = "<< db_U_or_I << " дБ" << endl;
+    cout << "  Отношение напряжений или токов = "<< times_U_or_I << endl;
+    return;
+  }
+  
+  if (times_P)
+  {
+    cout << "  Отношение мощностей = "<< db_P << " дБ" << endl;
+    cout << "  Отношение мощностей = "<< times_P << endl;
+    return;
+  }
+}
+
 void big_help()
 {
   cout << "Описание команд:" << endl << endl;
@@ -514,6 +570,9 @@ void big_help()
   
   cout <<"  chip - Расшифровка маркировки чип-резистора" << endl << endl;
   
+  cout <<"  db - Перевод значений из децибелов в разы и наоборот";
+  cout << endl << endl;
+  
   cout <<"  solve - Расчет математического выражения." << endl << endl;
   
   cout <<"  quit или exit - Выход из программы." << endl << endl;
@@ -526,7 +585,8 @@ void big_help()
 void mini_help()
 {
   cout << "Список команд:" << endl;
-  cout << "ohm, diode, nom, nomlst, div, chip, solve, quit, exit, help, h \n";
+  cout << "ohm, diode, nom, nomlst, div, chip, solve, db, quit, exit, help, h";
+  cout << endl;
 }
 
 void test_solve()
@@ -540,6 +600,7 @@ int main(int argv, char **argc)
     {
       string func;
       input("Команда: ", func);
+      if (func == "db")    { db();        continue; }
       if (func == "solve") { test_solve();continue; }
       if (func == "ohm")   { ohm();       continue; }
       if (func == "diode") { diode();     continue; }
