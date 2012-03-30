@@ -572,6 +572,8 @@ void big_help()
   
   cout <<"  db - Перевод значений из децибелов в разы и наоборот";
   cout << endl << endl;
+
+  cout <<"  res - Расчет параллельного соединения резисторов" << endl << endl;
   
   cout <<"  solve - Расчет математического выражения." << endl << endl;
   
@@ -585,7 +587,7 @@ void big_help()
 void mini_help()
 {
   cout << "Список команд:" << endl;
-  cout << "ohm, diode, nom, nomlst, div, chip, solve, db, quit, exit, help, h";
+  cout << "ohm, diode, nom, nomlst, div, chip, solve, db, res, quit, exit, help, h";
   cout << endl;
 }
 
@@ -594,12 +596,32 @@ void test_solve()
   cout << "  Ответ: " << input(" Выражение: ") << endl;
 }
 
+void res()
+{
+  int r_count = 0;  
+  input(" Количество параллельных сопротивлений: ", r_count);
+  double Y = 0;
+  stringstream out_ss;
+  for (int r = 0; r < r_count; r++)
+  {
+    stringstream ss;
+    ss << " Сопротивление " << r + 1 << ", Ом: ";
+    string str = ss.str();
+    double R = input(str);
+    out_ss << R;
+    if (r < r_count - 1) out_ss << " || ";
+    Y += 1/R;
+  }
+  cout << "  " << out_ss.str() << " = " << output(1/Y) << "Ом" << endl;
+}
+
 int main(int argv, char **argc)
 {
   while(1)
     {
       string func;
       input("Команда: ", func);
+      if (func == "res")   { res();       continue; }
       if (func == "db")    { db();        continue; }
       if (func == "solve") { test_solve();continue; }
       if (func == "ohm")   { ohm();       continue; }
