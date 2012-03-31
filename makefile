@@ -2,7 +2,7 @@ TARGET = ecalc
 SRC = ecalc.cpp
 
 TARGET:
-	g++ $(SRC) -o $(TARGET)
+	g++ -Wall $(SRC) -o $(TARGET)
 	
 run: $(TARGET)
 	./$(TARGET)

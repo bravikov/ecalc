@@ -36,7 +36,7 @@ double solve(string exp)
   
   int br = 0;
   
-  for(int i = 0; i < exp.size(); i++)
+  for(unsigned i = 0; i < exp.size(); i++)
   {
     if ( exp[i] == '(' ) br++;
     if ( exp[i] == ')' ) br--;
@@ -68,7 +68,7 @@ double solve(string exp)
   }
   
   // Возведение в степень
-  for(int i = 0; i < exp.size(); i++)
+  for(unsigned i = 0; i < exp.size(); i++)
   {
     if ( exp[i] == '(' ) br++;
     if ( exp[i] == ')' ) br--;
@@ -271,7 +271,6 @@ void nom()
   int e = 0; // Кол-во элементво в ряду (6, 12, 24, 48, 96 или 192)
   double v = 0;
   
-  int n = 0;
   // цикл прервется, когда будет введено достаточное количесво параметров
   while(1)
     {
@@ -502,7 +501,6 @@ void db()
   double times_P = 0;
   double times_U_or_I = 0;
   
-  int n;
   while(1)
   {
     db_U_or_I = input(" Отношение напряжения или тока, дБ: ");
@@ -575,6 +573,8 @@ void big_help()
 
   cout <<"  res - Расчет параллельного соединения резисторов" << endl << endl;
   
+  cout <<"  opamp - Расчет схем на операционных усилителях" << endl << endl;
+  
   cout <<"  solve - Расчет математического выражения." << endl << endl;
   
   cout <<"  quit или exit - Выход из программы." << endl << endl;
@@ -586,8 +586,23 @@ void big_help()
 
 void mini_help()
 {
-  cout << "Список команд:" << endl;
-  cout << "ohm, diode, nom, nomlst, div, chip, solve, db, res, quit, exit, help, h";
+  cout << "Список команд в алфавитном порядке:" << endl;
+  
+  cout << "chip, ";
+  cout << "db, ";
+  cout << "diode, ";
+  cout << "div, ";
+  cout << "exit, ";
+  cout << "h, ";
+  cout << "help, ";
+  cout << "nom, ";
+  cout << "nomlst, ";
+  cout << "ohm, "; 
+  cout << "opamp, ";
+  cout << "res, ";
+  cout << "solve, ";
+  cout << "quit";  
+  
   cout << endl;
 }
 
@@ -615,12 +630,89 @@ void res()
   cout << "  " << out_ss.str() << " = " << output(1/Y) << "Ом" << endl;
 }
 
+void opamp()
+{
+  string circuit_type;
+  input(" Тип схемы [inv, ninv]: ", circuit_type);
+  
+  if (circuit_type != "inv" && circuit_type != "ninv")
+  {
+    cout << "  Ошибка: неверно задан параметр" << endl;
+    return;
+  }
+  
+  double R1 = 0, R2 = 0, K = 0;
+  
+  while(1)
+  {
+    K = input(" Коэффициент усиления: ");
+    R1 = input(" Сопротивление обратной связи, Ом: ");
+    if (K && R1) break;
+    R2 = input(" Другое сопротивление, Ом: ");
+    break;
+  }
+  
+  if (K < 0) K = -K;
+  
+  if (circuit_type == "inv")
+  {
+    if      (K  && R1) R2 = R1 / K;
+    else if (K  && R2) R1 = R2 * K;
+    else if (R1 && R2) K  = R1 / R2;
+    else
+    {
+      cout << "  Ошибка: задано недостаточно параметров" << endl;
+      return;
+    }
+    
+    cout << "  Инвертирующая схема:" << endl;
+    cout << "                         R1\n"
+            "                        ____\n"
+            "                    ---|____|---\n"
+            "              R2    |          |\n"
+            "             ____   |  |\\      |\n"
+            "     Uвх ---|____|-----o \\     |\n"
+            "                       |  \\____|__ Uвых\n"
+            "                       |  /\n"
+            "                  |----| /\n"
+            "                       |/\n";
+  }
+  else
+  {
+    if      (K  && R1) R2 = R1 / (K - 1);
+    else if (K  && R2) R1 = R2 * (K - 1);
+    else if (R1 && R2) K  = 1 + R1 / R2;
+    else
+    {
+      cout << "  Ошибка: задано недостаточно параметров" << endl;
+      return;
+    }
+    
+    cout << "  Неинвертирующая схема:" << endl;
+    cout << "                         R1\n"
+            "                        ____\n"
+            "                    ---|____|---\n"
+            "              R2    |          |\n"
+            "             ____   |  |\\      |\n"
+            "        |---|____|-----o \\     |\n"
+            "                       |  \\____|__ Uвых\n"
+            "                       |  /\n"
+            "               Uвх ----| /\n"
+            "                       |/\n";
+  }
+  
+  cout << "  Коэффициент усиления, Uвых / Uвх = " << K << endl;
+  cout << "  R1 = " << output(R1) << "Ом" << endl;
+  cout << "  R2 = " << output(R2) << "Ом" << endl;
+}
+
 int main(int argv, char **argc)
 {
   while(1)
     {
       string func;
       input("Команда: ", func);
+      if (func == "opamp") { opamp();     continue; }
       if (func == "res")   { res();       continue; }
       if (func == "db")    { db();        continue; }
       if (func == "solve") { test_solve();continue; }
